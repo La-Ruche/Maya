@@ -1,5 +1,5 @@
 {
-  "name": "bot.ts",
+  "name": "maya",
   "version": "v5.0.0-energistix",
   "author": "ghom",
   "description": "Discord bot in TypeScript",
@@ -7,7 +7,7 @@
   "type": "module",
   "style": "options",
   "scripts": {
-    "build": "gulp build",
+    "build": "tsc",
     "watch": "gulp watch",
     "start": "npm run build && node dist/index",
     "format": "prettier --write src tests",
