@@ -1,1 +1,1 @@
-export * from './app.native'
+export * from './app.native.js'
