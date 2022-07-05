@@ -1,11 +1,12 @@
-import * as app from '../app'
+import * as app from '../app.js'
 
 import figlet from 'figlet'
 import chalk from 'chalk'
 import boxen from 'boxen'
 
-app.Listener.new({
-    name: 'ready',
+const listener: app.Listener<"ready"> = {
+    event: 'ready',
+    description: "ready event",
     once: true,
     run: (client: app.discord.Client) => {
         figlet(client.user!.username, (err, text) => {
@@ -31,4 +32,6 @@ app.Listener.new({
             )
         })
     },
-})
+}
+
+export default listener

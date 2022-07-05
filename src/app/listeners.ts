@@ -1,11 +1,18 @@
-interface ListenerInterface {
-    name: string
-    once?: boolean
-    run: (...args: any[]) => void
-}
+import { discord } from "../app.native"
+import apiTypes from "discord-api-types/v8.js"
 
-export class Listener {
+interface MoreClientEvents {
+    raw: [packet: apiTypes.GatewayDispatchPayload]
+  }
+  
+type AllClientEvents = discord.ClientEvents & MoreClientEvents
 
-    public static new(params: ListenerInterface) {}
-
+export type Listener<EventName extends keyof AllClientEvents> = {
+  event: EventName
+  description: string
+  run: (
+    this: discord.Client<true>,
+    ...args: AllClientEvents[EventName]
+  ) => any
+  once?: boolean
 }
