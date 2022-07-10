@@ -141,6 +141,10 @@ export interface CommandOptions<
    */
   description: string
   /**
+   * Only message or slash
+   */
+  only?: 'MESSAGE' | 'SLASH'
+  /**
    * Description displayed in command detail
    */
   longDescription?: core.Scrap<string, [message: CommandMessageType[Type]]>

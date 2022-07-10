@@ -15,6 +15,13 @@ const listener: app.Listener<"interactionCreate"> = {
         `The "${interaction.commandName}" slash command is not yet implemented.`
       )
 
+    if (cmd.options.only == 'MESSAGE') {
+      return interaction.reply({
+        content: "This command can only be used as a message",
+        ephemeral: true
+      })
+    }
+
     if (interaction.isCommand()) {
       const subCommand = interaction.options.getSubcommand(false)
 

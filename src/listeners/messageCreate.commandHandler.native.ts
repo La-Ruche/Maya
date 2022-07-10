@@ -83,6 +83,8 @@ const listener: app.Listener<"messageCreate"> = {
 
     let cmd = app.commands.resolve(key) as app.Command<any, app.SlashType>
 
+    if (cmd.options.only == 'SLASH') return
+
     if (!cmd) {
       if (app.defaultCommand) {
         key = ""
