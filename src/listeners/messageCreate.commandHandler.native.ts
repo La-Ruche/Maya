@@ -1,8 +1,7 @@
 import * as app from "../app.js"
 import yargsParser from "yargs-parser"
-import { filename } from "dirname-filename-esm"
 
-const __filename = filename(import.meta)
+const __filename = app.filename(import.meta)
 
 const listener: app.Listener<"messageCreate"> = {
   event: "messageCreate",
@@ -47,8 +46,7 @@ const listener: app.Listener<"messageCreate"> = {
       return m
     }.bind(message)
 
-    message.isFromBotOwner =
-      message.author.id === (await app.getBotOwnerId(message))
+    message.isFromBotOwner = message.author.id === process.env.BOT_OWNER
 
     app.emitMessage(message.channel, message)
     app.emitMessage(message.author, message)
@@ -83,7 +81,7 @@ const listener: app.Listener<"messageCreate"> = {
     // turn ON/OFF
     if (key !== "turn" && !app.cache.ensure<boolean>("turn", true)) return
 
-    let cmd: app.Command<any> = app.commands.resolve(key) as app.Command<any>
+    let cmd = app.commands.resolve(key) as app.Command<any, app.SlashType>
 
     if (!cmd) {
       if (app.defaultCommand) {
@@ -129,9 +127,11 @@ const listener: app.Listener<"messageCreate"> = {
 
     // parse CommandMessage arguments
     const parsedArgs = yargsParser(dynamicContent)
-    const restPositional = (parsedArgs._?.slice() ?? []).map(String)
+    const restPositional = parsedArgs._.slice() ?? []
 
-    message.args = restPositional.map((positional) => {
+    message.isMessage = true
+    message.isInteraction = false
+    message.args = (parsedArgs._?.slice(0) ?? []).map((positional) => {
       if (/^(?:".+"|'.+')$/.test(positional))
         return positional.slice(1, positional.length - 1)
       return positional
@@ -161,7 +161,7 @@ const listener: app.Listener<"messageCreate"> = {
       message.channel
         .send(
           app.code.stringify({
-            content: `Error: ${
+            content: `${error.name ?? "Error"}: ${
               error.message?.replace(/\x1b\[\d+m/g, "") ?? "unknown"
             }`,
             lang: "js",

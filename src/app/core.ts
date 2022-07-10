@@ -10,33 +10,14 @@ import toObject from "dayjs/plugin/toObject.js"
 import discord from "discord.js"
 import EventEmitter from "events"
 import * as prettier from "prettier"
+import * as esm from "dirname-filename-esm"
 
 import * as logger from "./logger.js"
 
 export const startedAt = Date.now()
 
-export function die(message: string): never {
-  throw new Error(message)
-}
-
 export function uptime(): number {
   return Date.now() - startedAt
-}
-
-export async function getBotOwnerId({
-  client,
-}: {
-  client: discord.Client<true>
-}): Promise<string> {
-  const app = await client.application.fetch()
-  const ownerID =
-    app.owner instanceof discord.User
-      ? app.owner.id
-      : app.owner?.members.first()?.id
-
-  if (!ownerID) throw new Error("Bot owner not found.")
-
-  return ownerID
 }
 
 /**
@@ -349,3 +330,10 @@ export class SafeMessageEmbed extends discord.MessageEmbed {
     return this
   }
 }
+
+export function isDefined<Item>(item: Item | undefined): item is Item {
+  return item !== undefined
+}
+
+export const filename = esm.filename
+export const dirname = esm.dirname

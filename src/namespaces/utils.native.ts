@@ -1,8 +1,8 @@
-import * as app from "../app.js"
+import Discord from "discord.js"
 
 import guilds from "../tables/guilds.native.js"
 
-export async function prefix(guild?: app.Guild): Promise<string> {
+export async function prefix(guild?: Discord.Guild): Promise<string> {
   let prefix = process.env.BOT_PREFIX as string
   if (guild) {
     const guildData = await guilds.query
@@ -15,10 +15,3 @@ export async function prefix(guild?: app.Guild): Promise<string> {
   }
   return prefix
 }
-
-export const hasMedia = new app.Middleware("Has media ?", (message) => {
-  return (
-    message.attachments.size > 0 ||
-    app.die("You need to attach a file to your message.")
-  )
-})

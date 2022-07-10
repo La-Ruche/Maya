@@ -31,7 +31,7 @@ export default new app.Command({
           lang: "yml",
           content: [
             `author: ${
-              message.client.users.cache.get(await app.getBotOwnerId(message))
+              message.client.users.cache.get(process.env.BOT_OWNER as string)
                 ?.tag
             }`,
             `uptime: ${time.duration(app.uptime(), {
