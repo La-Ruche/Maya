@@ -1,0 +1,9 @@
+select-role:
+  roles:
+    - name:       roleName
+    description:  roleDescription
+    value:        roleId
+
+    - name:       roleName
+    description:  roleDescription
+    value:        roleId
