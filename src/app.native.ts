@@ -8,6 +8,7 @@ export * from "./app/logger.js"
 export * from "./app/slash.js"
 export * from "./app/table.js"
 export * from "./app/core.js"
+export * from "./app/helpers.js"
 
 export * from "discord.js"
 export * from "@discordjs/builders"

@@ -1,9 +1,7 @@
 select-role:
   roles:
-    - name:       roleName
-    description:  roleDescription
-    value:        roleId
-
-    - name:       roleName
-    description:  roleDescription
-    value:        roleId
+    - {
+      name: t1,
+      desc: t1 desc,
+      value: "45646",
+    }
