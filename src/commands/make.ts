@@ -44,7 +44,10 @@ export default new app.Command({
                             ])
                     )
 
-                message.send({ content: "test", components: [row] })
+                let member = message.member as app.GuildMember
+                let channel = await member.guild.channels.fetch(message.channelId)
+
+                if (channel?.isText()) channel.send({ content: "test", components: [row] })
             }
         })
     ]

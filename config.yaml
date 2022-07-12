@@ -1,7 +1,9 @@
 select-role:
+  placeholder: Super placeholder
+  customId: select-role
   roles:
     - {
-      name: t1,
-      desc: t1 desc,
+      label: t1,
+      description: t1 desc,
       value: "45646",
     }
