@@ -1,24 +1,30 @@
 import * as app from "../../app.js"
 
+type SelectRoleConfig = {
+  customId: string
+  placeholder: string
+  roles: {
+    label: string
+    description: string
+    value: string
+  }[]
+}
+
 export default new app.Command({
   name: "select-role",
   only: "SLASH",
   description: "Make react role function in this server",
   userPermissions: ["ADMINISTRATOR"],
   async run(message) {
+    const config: SelectRoleConfig = await app.config('select-role')
+
     const row = new app.MessageActionRow().addComponents(
       new app.MessageSelectMenu()
-        .setCustomId("select-role")
-        .setMaxValues(1)
+        .setCustomId(config.customId)
+        .setMaxValues(config.roles.length)
         .setMinValues(1)
-        .setPlaceholder("Select your roles !")
-        .setOptions([
-          {
-            label: "t1",
-            description: "role t1",
-            value: "11111",
-          },
-        ])
+        .setPlaceholder(config.placeholder)
+        .setOptions(config.roles)
     )
 
     let member = message.member as app.GuildMember

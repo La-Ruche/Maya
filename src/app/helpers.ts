@@ -12,7 +12,7 @@ export async function config(name: string) {
 }
 
 export async function subs(name: string) {
-    let file = await import(path.join(process.cwd(), 'dist', 'commands', 'subs', `${name}.js`))
+    let file = await import("file://" + path.join(process.cwd(), 'dist', 'commands', 'subs', `${name}.js`))
 
     return file.default as Command<keyof CommandMessageType, SlashType>
 }

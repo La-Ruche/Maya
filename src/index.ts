@@ -21,8 +21,6 @@ export const client = new discord.Client({
 
 const app = await import("./app.js")
 
-console.log(app.config('select-role'))
-
 try {
   await app.tableHandler.load(client)
   await app.commandHandler.load(client)

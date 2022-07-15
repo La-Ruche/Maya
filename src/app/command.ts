@@ -13,6 +13,7 @@ import * as argument from "./argument.js"
 
 import { filename } from "dirname-filename-esm"
 import { castValue } from "./argument.js"
+import { lstatSync } from "fs"
 
 const __filename = filename(import.meta)
 
@@ -21,6 +22,7 @@ export const commandHandler = new handler.Handler(
 )
 
 commandHandler.on("load", async (filepath) => {
+  if (lstatSync(filepath).isDirectory()) return
   const file = await import("file://" + filepath)
   if (filepath.endsWith(".native.js")) file.default.options.native = true
   file.default.filepath = filepath
