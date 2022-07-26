@@ -1,68 +1,62 @@
-import * as app from "../app.js"
+import discord from "discord.js"
+import path from "path"
 
-export type SlashDeployment = { guilds?: string[]; global: boolean }
-export type SlashBuilder = app.ApplicationCommandData
-export type SlashType = {
-  builder: SlashBuilder
-  deploy: SlashDeployment
-}
+import * as handler from "@ghom/handler"
 
 import { REST } from "@discordjs/rest"
+import { SlashCommandBuilder } from "@discordjs/builders"
 
-import chalk from "chalk"
+export const slashHandler = new handler.Handler(
+  process.env.BOT_COMMANDS_PATH ?? path.join(process.cwd(), "dist", "slash")
+)
 
-const rest = new REST({ version: "9" }).setToken(
+slashHandler.on("load", async (filepath: string) => {
+  const file = await import("file://" + filepath)
+  const item: SlashCommand<any> = file.default
+  if (filepath.endsWith(".native.js")) item.native = true
+  item.filepath = filepath
+  return slashCommands.push(item)
+})
+
+export const slashCommands: SlashCommand<any>[] = []
+
+export const rest = new REST({ version: "9" }).setToken(
   process.env.BOT_TOKEN as string
 )
 
-export async function reloadSlashCommands(client: app.Client<true>) {
-  const slashCommands = await getSlashCommands()
-  const guilds = Array.from(client.guilds.cache.values())
-  let failCount = 0
+/**
+ * todo: Build context from builder arguments typings
+ */
+export type SlashCommandArguments<Base extends SlashCommandBuilder> = {}
 
-  let globalCmds = []
-  let guildCmds: {
-    cmds: SlashBuilder[]
-    guildId: string
-  }[] = []
-
-  for (const slashCmd of slashCommands) {
-    if (slashCmd.deploy.global) {
-      globalCmds.push(slashCmd.builder)
-    } else {
-      if (slashCmd.deploy.guilds) {
-        slashCmd.deploy.guilds.map((guild) => {
-          const guildCmd = guildCmds.find((g) => g.guildId === guild)
-
-          if (!guildCmd) {
-            guildCmds.push({
-              cmds: [slashCmd.builder],
-              guildId: guild,
-            })
-          } else {
-            guildCmd.cmds.push(slashCmd.builder)
-          }
-        })
-      }
-    }
-
-    client.application.commands.set(globalCmds)
-    guildCmds.map((guildCmd) => {
-      client.application.commands.set(guildCmd.cmds, guildCmd.guildId)
-    })
-
-    app.log(`loaded slash commands for all`)
-  }
-
-  app.log(
-    `loaded ${chalk.blueBright(
-      slashCommands.length
-    )} slash commands for ${chalk.blueBright(
-      guilds.length - failCount
-    )} guilds (${chalk.red(failCount)} fails)`
-  )
+export type SlashCommandContext<
+  Base extends SlashCommandBuilder,
+  Interaction extends discord.CommandInteraction
+> = Interaction & {
+  args: SlashCommandArguments<Base>
 }
 
-export async function getSlashCommands() {
-  return app.commands.map((cmd) => cmd.options.slash).filter(app.isDefined)
+export type SlashCommandOptions<Base extends SlashCommandBuilder> = Base & {
+  run: (
+    this: SlashCommand<Base>,
+    context: SlashCommandContext<Base, any>
+  ) => unknown
+}
+
+export class SlashCommand<Base extends SlashCommandBuilder> {
+  /**
+   * @deprecated
+   */
+  public filepath = ""
+
+  /**
+   * @deprecated
+   */
+  public native = false
+
+  constructor(public readonly options: SlashCommandOptions<Base>) {}
+
+  run(context: SlashCommandContext<Base, any>) {
+    this.options.run.bind(this)(context)
+  }
 }

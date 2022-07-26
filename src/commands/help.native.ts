@@ -4,7 +4,6 @@ import * as core from "../app/core.js"
 export default new app.Command({
   name: "help",
   description: "Help menu",
-  only: 'MESSAGE',
   longDescription: "Display all commands of bot or detail a target command.",
   channelType: "all",
   aliases: ["h", "usage", "detail", "details"],
