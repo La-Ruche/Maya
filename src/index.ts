@@ -25,6 +25,7 @@ client.login(process.env.BOT_TOKEN).catch((err) => {
 try {
   await app.tableHandler.load()
   await app.commandHandler.load()
+  await app.slashHandler.load()
   await app.listenerHandler.load()
 } catch (error: any) {
   app.error(error, __filename, true)

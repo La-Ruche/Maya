@@ -13,34 +13,46 @@ export const slashHandler = new handler.Handler(
 slashHandler.on("load", async (filepath: string) => {
   const file = await import("file://" + filepath)
   const item: SlashCommand<any> = file.default
-  if (filepath.endsWith(".native.js")) item.native = true
-  item.filepath = filepath
+  slashCommandsForDeploy.push(item.options.builder)
   return slashCommands.push(item)
 })
 
 export const slashCommands: SlashCommand<any>[] = []
+const slashCommandsForDeploy: discord.ApplicationCommandData[] = []
 
 export const rest = new REST({ version: "9" }).setToken(
   process.env.BOT_TOKEN as string
 )
 
+export const deploySlashCommand = async (client: discord.Client<true>) => {
+  client.application.commands.set(slashCommandsForDeploy, process.env.BOT_DEFAULT_GUILD as string)
+}
+
 /**
  * todo: Build context from builder arguments typings
  */
-export type SlashCommandArguments<Base extends SlashCommandBuilder> = {}
+export type SlashCommandArguments<Base extends SlashCommandBuilder> = {
+  builder: discord.ApplicationCommandData,
+  subs?: SlashCommandSubs<Base>[],
+  run: (
+    this: SlashCommand<Base>,
+    context: discord.CommandInteraction
+  ) => unknown
+}
+
+export type SlashCommandSubs<Base extends SlashCommandBuilder> = {
+  name: string,
+  run: (
+    this: SlashCommand<Base>,
+    context: discord.CommandInteraction
+  ) => unknown
+}
 
 export type SlashCommandContext<
   Base extends SlashCommandBuilder,
   Interaction extends discord.CommandInteraction
 > = Interaction & {
   args: SlashCommandArguments<Base>
-}
-
-export type SlashCommandOptions<Base extends SlashCommandBuilder> = Base & {
-  run: (
-    this: SlashCommand<Base>,
-    context: SlashCommandContext<Base, any>
-  ) => unknown
 }
 
 export class SlashCommand<Base extends SlashCommandBuilder> {
@@ -54,7 +66,7 @@ export class SlashCommand<Base extends SlashCommandBuilder> {
    */
   public native = false
 
-  constructor(public readonly options: SlashCommandOptions<Base>) {}
+  constructor(public readonly options: SlashCommandArguments<Base>) {}
 
   run(context: SlashCommandContext<Base, any>) {
     this.options.run.bind(this)(context)
